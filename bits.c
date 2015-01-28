@@ -166,7 +166,7 @@ NOTES:
  *   Rating: 1
  */
 int bitNor(int x, int y) {
-  return 2;
+  return (~x & ~y);
 }
 /* 
  * bitXor - x^y using only ~ and & 
@@ -176,12 +176,7 @@ int bitNor(int x, int y) {
  *   Rating: 2
  */
 int bitXor(int x, int y) {
-
-
-
-
-  return 2;
-
+  return ~x & y;
 }
 /* 
  * isNotEqual - return 0 if x == y, and 1 otherwise 
@@ -191,7 +186,7 @@ int bitXor(int x, int y) {
  *   Rating: 2
  */
 int isNotEqual(int x, int y) {
-  return 2;
+  return !!(x ^ y);
 }
 /* 
  * getByte - Extract byte n from word x
@@ -294,7 +289,11 @@ int isGreater(int x, int y) {
  *   Rating: 2
  */
 int divpwr2(int x, int n) {
-    return 2;
+   //right shift 31 does an arithmetic shift to get the sign bit
+   //if the sign bit is 1, the number was negative, this is necessary as
+   //+1 needs to be added in such cases
+   int add = ((x >> n) >> 31) & ((1 << n) + ~0);
+   return (x + add) >> n;
 }
 /* 
  * abs - absolute value of x (except returns TMin for TMin)
@@ -304,7 +303,16 @@ int divpwr2(int x, int n) {
  *   Rating: 4
  */
 int abs(int x) {
-  return 2;
+  int sign = x >> 31; //gets the msb (1 or 0)
+  int add = 1 + ~sign; //one plus negation of sign bit (1 or 0 again)
+  int value = x ^ sign;
+  return value + add;
+  
+  //  11111111 (-1 with 8 bits)
+  // ^11111111
+  // ------------
+  //  00000000 + 1 = 1 thus returning abs
+  
 }
 /* 
  * addOK - Determine if can compute x+y without overflow
